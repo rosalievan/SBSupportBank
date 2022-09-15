@@ -11,7 +11,6 @@ namespace SupportBank
         {
         this.accountList = AccountParser.runAccountParser().Item1;
         this.transactionList = AccountParser.runAccountParser().Item2;
-        
         }
 
         public List<Transaction> transactionListGetter()

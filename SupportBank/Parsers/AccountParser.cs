@@ -30,7 +30,7 @@ namespace SupportBank.Parsers
 
                         Account account1;
 
-                        if (matches1 is not null)
+                        if (!matches1.Any())
                         { 
                             account1 = new Account(values[1], 0);
                             accounts.Add(account1);
@@ -43,7 +43,7 @@ namespace SupportBank.Parsers
                         Account account2;
                         var matches2 = accounts.Where(p => p.accountHolderName == values[2]);
 
-                        if (matches2 is not null)
+                        if (!matches2.Any())
                         { 
                             account2 = new Account(values[2], 0);
                             accounts.Add(account2);
