@@ -1,4 +1,4 @@
-namespace SupportBank
+namespace SupportBank.Parsers
 {
     class TransactionParser
     {
