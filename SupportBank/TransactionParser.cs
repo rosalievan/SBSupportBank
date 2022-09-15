@@ -1,8 +1,8 @@
 namespace SupportBank
 {
-    class Parser
+    class TransactionParser
     {
-        public static List<Transaction> runParser()
+        public static List<Transaction> runTransactionParser()
         {
             bool isFirst=true;
             List<Transaction> transactionList = new List<Transaction>();

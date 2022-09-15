@@ -6,25 +6,11 @@ namespace SupportBank
     {
         static void Main(string[] args)
         {
-            List<Transaction> transactionList = Parser.runParser();
+            List<Transaction> transactionList = TransactionParser.runTransactionParser();
 
-            List<String> senders = transactionList.Select(x => x.Sender).Distinct().ToList();
-            List<String> recipients = transactionList.Select(x => x.Recipient).Distinct().ToList();
-            List<String> accountholders = senders.Union(recipients).ToList();
+            List<Account> accountList = AccountParser.runAccountParser(transactionList);
 
-            List<Account> accounts = new List<Account>();
-
-            foreach (String accountholder in accountholders)
-            {
-                Account account = new Account(
-                    accountholder, 
-                    0
-                    );
-                accounts.Add(account);
-            }
-            ;
-
-            foreach(Account account in accounts)
+            foreach(Account account in accountList)
             {
                 Console.WriteLine(account.accountHolderName);
                 Console.WriteLine(account.amount);
