@@ -9,8 +9,9 @@ namespace SupportBank
         
         public SupportBankClass()
         {
-        this.transactionList =  TransactionParser.runTransactionParser(); 
-        this.accountList = AccountParser.runAccountParser(this.transactionList);
+        this.accountList = AccountParser.runAccountParser().Item1;
+        this.transactionList = AccountParser.runAccountParser().Item2;
+        
         }
 
         public List<Transaction> transactionListGetter()
@@ -27,8 +28,8 @@ namespace SupportBank
         {
             foreach(Transaction transaction in transactionList)
             {
-                accountList.Where(account => account.accountHolderName == transaction.Sender).First().subtract(transaction.Amount);
-                accountList.Where(account => account.accountHolderName == transaction.Recipient).First().add(transaction.Amount);
+                accountList.Where(account => account.accountHolderName == transaction.Sender.accountHolderName).FirstOrDefault().subtract(transaction.Amount);
+                accountList.Where(account => account.accountHolderName == transaction.Recipient.accountHolderName).FirstOrDefault().add(transaction.Amount);
             }
         }
 
