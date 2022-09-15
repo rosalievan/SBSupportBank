@@ -13,6 +13,8 @@ namespace SupportBank
             supportBank1.Clearinghouse(supportBank1.transactionListGetter());
             supportBank1.ListAll(supportBank1.accountListGetter());
 
+            Console.WriteLine("Hallo Eline!");
+
         }
     }
 }
