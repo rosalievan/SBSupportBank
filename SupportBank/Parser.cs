@@ -5,7 +5,7 @@ namespace SupportBank
         public static List<Transaction> runParser()
         {
             bool isFirst=true;
-            List<Transaction> listA = new List<Transaction>();
+            List<Transaction> transactionList = new List<Transaction>();
             using(var reader = new StreamReader(@"C:\Users\rvano\OneDrive\Desktop\SB\SupportBank\SupportBank\Transactions.csv"))
             {
                 var headerLine = reader.ReadLine();
@@ -31,14 +31,14 @@ namespace SupportBank
                         values[3], 
                         Decimal.Parse(values[4])
                     );
-                    listA.Add(transaction);
+                    transactionList.Add(transaction);
 
                     }
                 }
                
             }
 
-        return listA;
+        return transactionList;
         }
     }
 }
