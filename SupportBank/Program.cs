@@ -8,13 +8,14 @@ namespace SupportBank
         static void Main(string[] args)
         {
             SupportBankClass supportBank1 = new SupportBankClass();
-            Console.WriteLine(supportBank1.accountList);
 
             supportBank1.Clearinghouse(supportBank1.transactionListGetter());
-            supportBank1.ListAll(supportBank1.accountListGetter());
+            supportBank1.ListBalance(supportBank1.accountListGetter());
 
-            Console.WriteLine("Hallo Eline!");
-
+            supportBank1.AddTransactions();
+            supportBank1.ListTransactionsForAccount(
+                supportBank1.accountList.First(account => account.accountHolderName == "Dan W")
+                );
         }
     }
 }
