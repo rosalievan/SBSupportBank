@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 namespace SupportBank.Parsers
 {
     class AccountParser
@@ -15,7 +16,7 @@ namespace SupportBank.Parsers
                             LocalAccountList.Add(account);
                         }
                         else
-                        { 
+                        {
                             account = LocalAccountList.Where(instance => instance.accountHolderName == accountHolderName).FirstOrDefault();
                         }
             return account;
@@ -25,44 +26,72 @@ namespace SupportBank.Parsers
             List<Transaction> TransactionList = new List<Transaction>();
             LocalAccountList = AccountList;
 
-            using(var reader = new StreamReader(@"C:\Users\rvano\OneDrive\Desktop\SB\SupportBank\SupportBank\" + source + ".csv"))
+            if( source.Split('.')[1] == "csv")
             {
-                var headerLine = reader.ReadLine();
-                bool isFirst = true;
-                while (reader.Peek() != -1)
+                using(var reader = new StreamReader(@"C:\Users\rvano\OneDrive\Desktop\SB\SupportBank\SupportBank\" + source))
                 {
-                    if(isFirst)
-                        {
-                            isFirst=false;
-                            continue;
-                        }
-                    
-                    var line = reader.ReadLine();
-                    if (line is not null)
+                    var headerLine = reader.ReadLine();
+                    bool isFirst = true;
+                    while (reader.Peek() != -1)
                     {
-                        var values = line.Split(',');
-
-                        // add unique accounts
+                        if(isFirst)
+                            {
+                                isFirst=false;
+                                continue;
+                            }
                         
-                        string accountHolderNameSender = values[1];
-                        Account accountSender = assignAccount(accountHolderNameSender);
+                        var line = reader.ReadLine();
+                        if (line is not null)
+                        {
+                            var values = line.Split(',');
 
-                        string accountHolderNameRecipient = values[2];
-                        Account accountRecipient = assignAccount(accountHolderNameRecipient);
+                            // add unique accounts
+                            
+                            string accountHolderNameSender = values[1];
+                            Account accountSender = assignAccount(accountHolderNameSender);
 
-                        Transaction transaction = new Transaction(
-                            DateTime.Parse(values[0]), 
-                            accountSender,
-                            accountRecipient,
-                            values[3], 
-                            Decimal.Parse(values[4])
-                        );
-                        TransactionList.Add(transaction);
-                        
-                        AccountList = LocalAccountList;
-                    }
-                }        
+                            string accountHolderNameRecipient = values[2];
+                            Account accountRecipient = assignAccount(accountHolderNameRecipient);
+
+                            try{
+                            Transaction transaction = new Transaction(
+                                DateTime.Parse(values[0]), 
+                                accountSender,
+                                accountRecipient,
+                                values[3], 
+                                Decimal.Parse(values[4])
+                            );
+                            TransactionList.Add(transaction);
+                            }
+                            catch(System.FormatException)
+                            {
+                                Console.WriteLine("You have entered data in the wrong format, the following transaction will not be added to the database");
+                                Console.WriteLine("--------");
+                                Console.WriteLine("date: " + values[0]);
+                                Console.WriteLine("from: " + values[1]);
+                                Console.WriteLine("to: " + values[2]);
+                                Console.WriteLine("description: " + values[3]);
+                                Console.WriteLine("amount: "+ values[4]);
+                                Console.WriteLine("");
+                            }
+
+                            AccountList = LocalAccountList;
+                        }
+                    }        
+                }
             }
+
+    //         else if( source.Split('.')[1] == "json")
+
+    //         {
+    //             using (StreamReader file = File.OpenText(@$"C:\Users\rvano\OneDrive\Desktop\SB\SupportBank\SupportBank\{source}"))
+    //    {         List<Transaction> transactions = JsonConvert.DeserializeObject<List<Transaction>>(file);
+
+    //             foreach (Transaction transaction in transactions)
+    //             {
+    //                 Console.WriteLine(transaction.TimeStamp);
+    //             }}
+    //         }
          
             return (AccountList, TransactionList);
 

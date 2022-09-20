@@ -18,8 +18,9 @@ namespace SupportBank
         
         public void AddDataToBank(string source)
         {
-            AccountList = AccountParser.runAccountParser(source, AccountList).Item1;
-            TransactionList.AddRange(AccountParser.runAccountParser(source, AccountList).Item2);
+            (List<Account>, List<Transaction>) output = AccountParser.runAccountParser(source, AccountList);
+            AccountList = output.Item1;
+            TransactionList.AddRange(output.Item2);
         }
 
         public void ExecuteTransactionsAndAddToAccount()
@@ -30,7 +31,7 @@ namespace SupportBank
 
                 AccountList.First(account => account.accountHolderName == transaction.Recipient.accountHolderName).UpdateBalance(-transaction.Amount);
 
-                AccountList.Where(account => account.accountHolderName ==  transaction.Sender.accountHolderName).FirstOrDefault().addTransaction(transaction);
+                AccountList.First(account => account.accountHolderName ==  transaction.Sender.accountHolderName).addTransaction(transaction);
             }
         }
 
@@ -41,6 +42,21 @@ namespace SupportBank
             {
                 Console.WriteLine(account.accountHolderName);
                 Console.WriteLine(account.balance);
+            }
+        }
+
+        public void PrintTransactionForAccount(string RequestedAccountHolderName)
+        {
+            Console.WriteLine("Printing Transactions for " + RequestedAccountHolderName);
+            try{
+            AccountList.First(account => account.accountHolderName == RequestedAccountHolderName).PrintTransactions();
+            }
+            catch (System.InvalidOperationException){
+                Console.WriteLine("no records for this individual, please type in one of the following names");
+                foreach (Account account in AccountList)
+                {
+                    Console.WriteLine(account.accountHolderName);
+                }
             }
         }
 

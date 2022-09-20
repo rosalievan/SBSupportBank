@@ -19,14 +19,31 @@ namespace SupportBank
 
             SupportBankClass supportBank1 = new SupportBankClass();
 
-            supportBank1.AddDataToBank("Transactions");
-            // supportBank1.AddDataToBank("Transactions2015");
+            supportBank1.AddDataToBank("Transactions.csv");
+            supportBank1.AddDataToBank("Transactions2015.csv");
+            // supportBank1.AddDataToBank("Transactions2013.json");
 
             supportBank1.ExecuteTransactionsAndAddToAccount();
 
-            supportBank1.Overview();
+            if (args[0] == "Overview")
+            {
+                supportBank1.Overview();
+            }
 
-            supportBank1.AccountList.First(account => account.accountHolderName == "Dan W").PrintTransactions();
+            if (args[0] == "ListTransactionsFor")
+            {
+                if (args.Length == 3)
+                {
+                    supportBank1.PrintTransactionForAccount(args[1]+" "+args[2]);
+                }
+                else{
+                    supportBank1.PrintTransactionForAccount(args[1]);
+                }
+             
+            }            
+
+            
+            
         }
     }
 }
