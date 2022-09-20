@@ -2,12 +2,30 @@ namespace SupportBank.Parsers
 {
     class AccountParser
     {
-         public static (List<Account>, List<Transaction>) runAccountParser()
-         {
-            List<Transaction> transactionList = new List<Transaction>();
-            List<Account> accounts = new List<Account>();
+        public static List<Account> LocalAccountList;
 
-            using(var reader = new StreamReader(@"C:\Users\rvano\OneDrive\Desktop\SB\SupportBank\SupportBank\Transactions.csv"))
+        public static Account assignAccount(string accountHolderName)
+        {
+            Account account;
+
+            var Accountexists = LocalAccountList.Where(p => p.accountHolderName == accountHolderName);
+            if (!Accountexists.Any())
+                        { 
+                            account = new Account(accountHolderName, 0);
+                            LocalAccountList.Add(account);
+                        }
+                        else
+                        { 
+                            account = LocalAccountList.Where(instance => instance.accountHolderName == accountHolderName).FirstOrDefault();
+                        }
+            return account;
+        }
+         public static (List<Account>, List<Transaction>) runAccountParser(string source, List<Account> AccountList)
+         {
+            List<Transaction> TransactionList = new List<Transaction>();
+            LocalAccountList = AccountList;
+
+            using(var reader = new StreamReader(@"C:\Users\rvano\OneDrive\Desktop\SB\SupportBank\SupportBank\" + source + ".csv"))
             {
                 var headerLine = reader.ReadLine();
                 bool isFirst = true;
@@ -25,55 +43,28 @@ namespace SupportBank.Parsers
                         var values = line.Split(',');
 
                         // add unique accounts
-
-                        var matches1 = accounts.Where(p => p.accountHolderName == values[1]);
-
-                        Account account1;
-
-                        if (!matches1.Any())
-                        { 
-                            account1 = new Account(values[1], 0);
-                            accounts.Add(account1);
-                        }
-                        else
-                        { 
-                            account1 = accounts.Where(instance => instance.accountHolderName == values[1]).FirstOrDefault();
-                        }
-
-                        Account account2;
-                        var matches2 = accounts.Where(p => p.accountHolderName == values[2]);
-
-                        if (!matches2.Any())
-                        { 
-                            account2 = new Account(values[2], 0);
-                            accounts.Add(account2);
-                        }
-                        else
-                        { 
-                            account2 = accounts.Where(instance => instance.accountHolderName == values[2]).FirstOrDefault();
-                        }
                         
+                        string accountHolderNameSender = values[1];
+                        Account accountSender = assignAccount(accountHolderNameSender);
+
+                        string accountHolderNameRecipient = values[2];
+                        Account accountRecipient = assignAccount(accountHolderNameRecipient);
 
                         Transaction transaction = new Transaction(
                             DateTime.Parse(values[0]), 
-                            account1,
-                            account2,
+                            accountSender,
+                            accountRecipient,
                             values[3], 
                             Decimal.Parse(values[4])
                         );
-
-                        transactionList.Add(transaction);
-
+                        TransactionList.Add(transaction);
+                        
+                        AccountList = LocalAccountList;
                     }
-                }
-               
+                }        
             }
-
-            // List<String> senders = transactionList.Select(x => x.Sender).Distinct().ToList();
-            // List<String> recipients = transactionList.Select(x => x.Recipient).Distinct().ToList();
-            // List<String> accountholders = senders.Union(recipients).ToList();
-           
-            return (accounts, transactionList);
+         
+            return (AccountList, TransactionList);
 
          }
     }

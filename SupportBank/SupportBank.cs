@@ -1,69 +1,48 @@
 using SupportBank.Parsers;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 namespace SupportBank
 {
     class SupportBankClass
     {
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        public List<Transaction> TransactionList { get; set; }
+        public List<Account> AccountList {get; set;}
 
-        public List<Transaction> transactionList { get; set; }
-        public List<Account> accountList {get; set;}
-        
         public SupportBankClass()
         {
-        this.accountList = AccountParser.runAccountParser().Item1;
-        this.transactionList = AccountParser.runAccountParser().Item2;
+            TransactionList = new List<Transaction>();
+            AccountList = new List<Account>() ;
+        }
+        
+        public void AddDataToBank(string source)
+        {
+            AccountList = AccountParser.runAccountParser(source, AccountList).Item1;
+            TransactionList.AddRange(AccountParser.runAccountParser(source, AccountList).Item2);
         }
 
-        public List<Transaction> transactionListGetter()
+        public void ExecuteTransactionsAndAddToAccount()
         {
-            return this.transactionList;
-        }
-
-        public List<Account> accountListGetter()
-        {
-            return this.accountList;
-        }
-
-        public void Clearinghouse(List<Transaction> transactionList)
-        {
-            foreach(Transaction transaction in transactionList)
+            foreach(Transaction transaction in TransactionList)
             {
-                accountList.Where(account => account.accountHolderName == transaction.Sender.accountHolderName).FirstOrDefault().subtract(transaction.Amount);
-                accountList.Where(account => account.accountHolderName == transaction.Recipient.accountHolderName).FirstOrDefault().add(transaction.Amount);
+                AccountList.First(account => account.accountHolderName == transaction.Sender.accountHolderName).UpdateBalance(transaction.Amount);
+
+                AccountList.First(account => account.accountHolderName == transaction.Recipient.accountHolderName).UpdateBalance(-transaction.Amount);
+
+                AccountList.Where(account => account.accountHolderName ==  transaction.Sender.accountHolderName).FirstOrDefault().addTransaction(transaction);
             }
         }
 
-        public void ListBalance(List<Account> accountList)
+        public void Overview()
         {         
         Console.WriteLine("How much is owed by each member of the supportbank");   
-        foreach(Account account in accountList)
+        foreach(Account account in AccountList)
             {
                 Console.WriteLine(account.accountHolderName);
-                Console.WriteLine(account.amount);
+                Console.WriteLine(account.balance);
             }
         }
-
-        public void AddTransactions()
-        {
-            foreach(Transaction transaction in transactionList)
-            {
-                accountList.Where(account => account.accountHolderName ==  transaction.Sender.accountHolderName).FirstOrDefault().addTransaction(transaction);
-            }
-        }
-
-        public void ListTransactionsForAccount(Account account1)
-        {
-            Account relevantAccount = accountList.First(account => account == account1);
-            Console.WriteLine($"Transactions completed by {relevantAccount.accountHolderName}");
-            foreach (Transaction transaction in relevantAccount.transactions)
-            {
-                Console.WriteLine("-----");
-                Console.WriteLine($"Date : {transaction.TimeStamp}");
-                Console.WriteLine($"Amount: {transaction.Amount}");
-                Console.WriteLine($"To: {transaction.Recipient.accountHolderName}");
-                Console.WriteLine($"Description: {transaction.Description}");
-            }
-        }
-
 
     }
 }
